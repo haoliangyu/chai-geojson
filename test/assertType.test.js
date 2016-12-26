@@ -36,5 +36,24 @@ describe('Assert Type', () => {
     expect(geometry).to.be.a('LineString');
   });
 
+  it('should assert the Polygon type.', () => {
+    let geometry = { type: 'Polygon', coordinates: [[[0, 0], [1, 1], [1, 2]]] };
+    expect(geometry).to.be.a('Polygon');
+  });
+
+  it('should assert the MultiPoint type.', () => {
+    let geometry = { type: 'MultiPoint', coordinates: [[0, 0], [1, 1]] };
+    expect(geometry).to.be.a('MultiPoint');
+  });
+
+  it('should assert the MultiLineString type.', () => {
+    let geometry = { type: 'MultiLineString', coordinates: [[[0, 0], [1, 1], [1, 2]]] };
+    expect(geometry).to.be.a('MultiLineString');
+  });
+
+  it('should assert the MultiPolygon type.', () => {
+    let geometry = { type: 'MultiPolygon', coordinates: [[[[0, 0], [1, 1], [1, 2]]]] };
+    expect(geometry).to.be.a('MultiPolygon');
+  });
 
 });

@@ -1,5 +1,21 @@
 import * as assertCoordArray from './assertCoordArray';
 
+const typeAssertFunction = {
+  FeatureCollection: isFeatureCollection,
+  Feature: isFeature,
+  Geometry: isGeometry,
+  Point: isPoint,
+  LineString: isLineString,
+  Polygon: isPolygon,
+  MultiPoint: isMultiPoint,
+  MultiLineString: isMultiLineString,
+  MultiPolygon: isMultiPolygin
+};
+
+export function getTypeAssertFunction(type) {
+  return typeAssertFunction[type];
+}
+
 export function isFeatureCollection(Assertion, obj) {
   new Assertion(obj).to.have.property('type').a('string');
   new Assertion(obj.type).to.equal('FeatureCollection');
@@ -38,16 +54,37 @@ export function isLineString(Assertion, obj) {
   assertCoordArray.isLineString(Assertion, obj.coordinates);
 }
 
-export function getTypeAssertFunction(type) {
-  if (type === 'FeatureCollection') {
-    return isFeatureCollection;
-  } else if (type === 'Feature') {
-    return isFeature;
-  } else if (type === 'Geometry') {
-    return isGeometry;
-  } else if (type === 'Point') {
-    return isPoint;
-  } else if (type === 'LineString') {
-    return isLineString;
-  }
+export function isPolygon(Assertion, obj) {
+  new Assertion(obj).to.have.property('type').a('string');
+  new Assertion(obj.type).to.equal('Polygon');
+  new Assertion(obj).to.have.property('coordinates').a('array');
+
+  assertCoordArray.isPolygon(Assertion, obj.coordinates);
+}
+
+export function isMultiPoint(Assertion, obj) {
+  new Assertion(obj).to.have.property('type').a('string');
+  new Assertion(obj.type).to.equal('MultiPoint');
+  new Assertion(obj).to.have.property('coordinates').a('array');
+
+  assertCoordArray.isLineString(Assertion, obj.coordinates);
+}
+
+export function isMultiLineString(Assertion, obj) {
+  new Assertion(obj).to.have.property('type').a('string');
+  new Assertion(obj.type).to.equal('MultiLineString');
+  new Assertion(obj).to.have.property('coordinates').a('array');
+
+  assertCoordArray.isPolygon(Assertion, obj.coordinates);
+}
+
+export function isMultiPolygin(Assertion, obj) {
+  new Assertion(obj).to.have.property('type').a('string');
+  new Assertion(obj.type).to.equal('MultiPolygon');
+  new Assertion(obj).to.have.property('coordinates').a('array');
+
+  obj.coordinates.forEach(polygon => {
+    new Assertion(polygon).to.be.a('array');
+    assertCoordArray.isPolygon(Assertion, polygon);
+  });
 }

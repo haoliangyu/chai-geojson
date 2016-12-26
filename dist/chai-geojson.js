@@ -13,6 +13,31 @@ function isLineString$1(Assertion, coordinates) {
   }));
 }
 
+function isPolygon$1(Assertion, coordinates) {
+  new Assertion(coordinates).to.have.length.above(0);
+
+  coordinates.forEach((function (lineString) {
+    new Assertion(lineString).to.be.a('array');
+    isLineString$1(Assertion, lineString);
+  }));
+}
+
+var typeAssertFunction = {
+  FeatureCollection: isFeatureCollection,
+  Feature: isFeature,
+  Geometry: isGeometry,
+  Point: isPoint$$1,
+  LineString: isLineString$$1,
+  Polygon: isPolygon$$1,
+  MultiPoint: isMultiPoint,
+  MultiLineString: isMultiLineString,
+  MultiPolygon: isMultiPolygin
+};
+
+function getTypeAssertFunction(type) {
+  return typeAssertFunction[type];
+}
+
 function isFeatureCollection(Assertion, obj) {
   new Assertion(obj).to.have.property('type').a('string');
   new Assertion(obj.type).to.equal('FeatureCollection');
@@ -51,18 +76,39 @@ function isLineString$$1(Assertion, obj) {
   isLineString$1(Assertion, obj.coordinates);
 }
 
-function getTypeAssertFunction(type) {
-  if (type === 'FeatureCollection') {
-    return isFeatureCollection;
-  } else if (type === 'Feature') {
-    return isFeature;
-  } else if (type === 'Geometry') {
-    return isGeometry;
-  } else if (type === 'Point') {
-    return isPoint$$1;
-  } else if (type === 'LineString') {
-    return isLineString$$1;
-  }
+function isPolygon$$1(Assertion, obj) {
+  new Assertion(obj).to.have.property('type').a('string');
+  new Assertion(obj.type).to.equal('Polygon');
+  new Assertion(obj).to.have.property('coordinates').a('array');
+
+  isPolygon$1(Assertion, obj.coordinates);
+}
+
+function isMultiPoint(Assertion, obj) {
+  new Assertion(obj).to.have.property('type').a('string');
+  new Assertion(obj.type).to.equal('MultiPoint');
+  new Assertion(obj).to.have.property('coordinates').a('array');
+
+  isLineString$1(Assertion, obj.coordinates);
+}
+
+function isMultiLineString(Assertion, obj) {
+  new Assertion(obj).to.have.property('type').a('string');
+  new Assertion(obj.type).to.equal('MultiLineString');
+  new Assertion(obj).to.have.property('coordinates').a('array');
+
+  isPolygon$1(Assertion, obj.coordinates);
+}
+
+function isMultiPolygin(Assertion, obj) {
+  new Assertion(obj).to.have.property('type').a('string');
+  new Assertion(obj.type).to.equal('MultiPolygon');
+  new Assertion(obj).to.have.property('coordinates').a('array');
+
+  obj.coordinates.forEach((function (polygon) {
+    new Assertion(polygon).to.be.a('array');
+    isPolygon$1(Assertion, polygon);
+  }));
 }
 
 var index = (function (chai, utils) {
