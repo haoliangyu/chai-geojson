@@ -1,26 +1,117 @@
 'use strict';
 
-function isPoint$1(Assertion, coordinates) {
-  new Assertion(coordinates).to.have.lengthOf(2);
+function isPoint$1(assertion, positiveMsg, negativeMsg) {
+  assertion.assert(assertion._obj.coordinates.length === 2, positiveMsg, negativeMsg);
 }
 
-function isLineString$1(Assertion, coordinates) {
-  new Assertion(coordinates).to.have.length.above(1);
+function isLineString$1(assertion, positiveMsg, negativeMsg) {
+  assertion.assert(assertion._obj.coordinates.length > 1, positiveMsg, negativeMsg);
 
-  coordinates.forEach((function (point) {
-    new Assertion(point).to.be.a('array');
-    isPoint$1(Assertion, point);
+  assertion._obj.coordinates.forEach((function (point) {
+    assertion.assert(Array.isArray(point) && point.length === 2, positiveMsg, negativeMsg);
   }));
 }
 
-function isPolygon$1(Assertion, coordinates) {
-  new Assertion(coordinates).to.have.length.above(0);
+function isPolygon$1(assertion, positiveMsg, negativeMsg) {
+  assertion.assert(assertion._obj.coordinates.length > 0, positiveMsg, negativeMsg);
 
-  coordinates.forEach((function (lineString) {
-    new Assertion(lineString).to.be.a('array');
-    isLineString$1(Assertion, lineString);
+  assertion._obj.coordinates.forEach((function (lineString) {
+    assertion.assert(Array.isArray(lineString) && lineString.length > 1, positiveMsg, negativeMsg);
+
+    lineString.forEach((function (point) {
+      assertion.assert(Array.isArray(point) && point.length === 2, positiveMsg, negativeMsg);
+    }));
   }));
 }
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var get = function get(object, property, receiver) {
+  if (object === null) object = Function.prototype;
+  var desc = Object.getOwnPropertyDescriptor(object, property);
+
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent === null) {
+      return undefined;
+    } else {
+      return get(parent, property, receiver);
+    }
+  } else if ("value" in desc) {
+    return desc.value;
+  } else {
+    var getter = desc.get;
+
+    if (getter === undefined) {
+      return undefined;
+    }
+
+    return getter.call(receiver);
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var set = function set(object, property, value, receiver) {
+  var desc = Object.getOwnPropertyDescriptor(object, property);
+
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent !== null) {
+      set(parent, property, value, receiver);
+    }
+  } else if ("value" in desc && desc.writable) {
+    desc.value = value;
+  } else {
+    var setter = desc.set;
+
+    if (setter !== undefined) {
+      setter.call(receiver, value);
+    }
+  }
+
+  return value;
+};
 
 var typeAssertFunction = {
   FeatureCollection: isFeatureCollection,
@@ -38,76 +129,82 @@ function getTypeAssertFunction(type) {
   return typeAssertFunction[type];
 }
 
-function isFeatureCollection(Assertion, obj) {
-  new Assertion(obj).to.have.property('type').a('string');
-  new Assertion(obj.type).to.equal('FeatureCollection');
-  new Assertion(obj).to.have.property('features').a('array');
+function isFeatureCollection(typeAssertion) {
+  typeAssertion.assert(typeAssertion._obj.type === 'FeatureCollection' && Array.isArray(typeAssertion._obj.features), "expected #{this} to be a FeatureCollection", "expected #{this} to not be a FeatureCollection");
 }
 
-function isFeature(Assertion, obj) {
-  new Assertion(obj).to.have.property('type').a('string');
-  new Assertion(obj.type).to.equal('Feature');
-  new Assertion(obj).to.have.property('geometry').a('object');
-  new Assertion(obj).to.have.property('properties').a('object');
+function isFeature(typeAssertion) {
+  typeAssertion.assert(typeAssertion._obj.type === 'Feature' && _typeof(typeAssertion._obj.geometry) === 'object' && _typeof(typeAssertion._obj.properties) === 'object', "expected #{this} to be a Feature", "expected #{this} to not be a Feature");
 }
 
-function isGeometry(Assertion, obj) {
-  new Assertion(obj).to.have.property('type').a('string');
-
-  var geometryType = obj.type;
+function isGeometry(typeAssertion) {
+  var geometryType = typeAssertion._obj.type;
   var assertFunction = getTypeAssertFunction(geometryType);
 
-  assertFunction(Assertion, obj);
+  assertFunction(typeAssertion);
 }
 
-function isPoint$$1(Assertion, obj) {
-  new Assertion(obj).to.have.property('type').a('string');
-  new Assertion(obj.type).to.equal('Point');
-  new Assertion(obj).to.have.property('coordinates').a('array');
+function isPoint$$1(typeAssertion) {
+  var positiveMsg = 'expected #{this} to be a Point';
+  var negativeMsg = 'expected #{this} to not be a Point';
 
-  isPoint$1(Assertion, obj.coordinates);
+  typeAssertion.assert(typeAssertion._obj.type === 'Point' && Array.isArray(typeAssertion._obj.coordinates), positiveMsg, negativeMsg);
+
+  isPoint$1(typeAssertion, positiveMsg, negativeMsg);
 }
 
-function isLineString$$1(Assertion, obj) {
-  new Assertion(obj).to.have.property('type').a('string');
-  new Assertion(obj.type).to.equal('LineString');
-  new Assertion(obj).to.have.property('coordinates').a('array');
+function isLineString$$1(typeAssertion) {
+  var positiveMsg = 'expected #{this} to be a LineString';
+  var negativeMsg = 'expected #{this} to not be a LineString';
 
-  isLineString$1(Assertion, obj.coordinates);
+  typeAssertion.assert(typeAssertion._obj.type === 'LineString' && Array.isArray(typeAssertion._obj.coordinates), positiveMsg, negativeMsg);
+
+  isLineString$1(typeAssertion, positiveMsg, negativeMsg);
 }
 
-function isPolygon$$1(Assertion, obj) {
-  new Assertion(obj).to.have.property('type').a('string');
-  new Assertion(obj.type).to.equal('Polygon');
-  new Assertion(obj).to.have.property('coordinates').a('array');
+function isPolygon$$1(typeAssertion) {
+  var positiveMsg = 'expected #{this} to be a Polygon';
+  var negativeMsg = 'expected #{this} to not be a Polygon';
 
-  isPolygon$1(Assertion, obj.coordinates);
+  typeAssertion.assert(typeAssertion._obj.type === 'Polygon' && Array.isArray(typeAssertion._obj.coordinates), positiveMsg, negativeMsg);
+
+  isPolygon$1(typeAssertion, positiveMsg, negativeMsg);
 }
 
-function isMultiPoint(Assertion, obj) {
-  new Assertion(obj).to.have.property('type').a('string');
-  new Assertion(obj.type).to.equal('MultiPoint');
-  new Assertion(obj).to.have.property('coordinates').a('array');
+function isMultiPoint(typeAssertion) {
+  var positiveMsg = 'expected #{this} to be a MultiPoint';
+  var negativeMsg = 'expected #{this} to not be a MultiPoint';
 
-  isLineString$1(Assertion, obj.coordinates);
+  typeAssertion.assert(typeAssertion._obj.type === 'MultiPoint' && Array.isArray(typeAssertion._obj.coordinates), positiveMsg, negativeMsg);
+
+  isLineString$1(typeAssertion, positiveMsg, negativeMsg);
 }
 
-function isMultiLineString(Assertion, obj) {
-  new Assertion(obj).to.have.property('type').a('string');
-  new Assertion(obj.type).to.equal('MultiLineString');
-  new Assertion(obj).to.have.property('coordinates').a('array');
+function isMultiLineString(typeAssertion) {
+  var positiveMsg = 'expected #{this} to be a MultiLineString';
+  var negativeMsg = 'expected #{this} to not be a MultiLineString';
 
-  isPolygon$1(Assertion, obj.coordinates);
+  typeAssertion.assert(typeAssertion._obj.type === 'MultiLineString' && Array.isArray(typeAssertion._obj.coordinates), positiveMsg, negativeMsg);
+
+  isPolygon$1(typeAssertion, positiveMsg, negativeMsg);
 }
 
-function isMultiPolygin(Assertion, obj) {
-  new Assertion(obj).to.have.property('type').a('string');
-  new Assertion(obj.type).to.equal('MultiPolygon');
-  new Assertion(obj).to.have.property('coordinates').a('array');
+function isMultiPolygin(typeAssertion) {
+  var positiveMsg = 'expected #{this} to be a MultiPolygon';
+  var negativeMsg = 'expected #{this} to not be a MultiPolygon';
 
-  obj.coordinates.forEach((function (polygon) {
-    new Assertion(polygon).to.be.a('array');
-    isPolygon$1(Assertion, polygon);
+  typeAssertion.assert(typeAssertion._obj.type === 'MultiPolygon' && Array.isArray(typeAssertion._obj.coordinates), positiveMsg, negativeMsg);
+
+  typeAssertion._obj.coordinates.forEach((function (polygon) {
+    typeAssertion.assert(Array.isArray(polygon) && polygon.length > 0, positiveMsg, negativeMsg);
+
+    polygon.forEach((function (lineString) {
+      typeAssertion.assert(Array.isArray(lineString) && lineString.length > 1, positiveMsg, negativeMsg);
+
+      lineString.forEach((function (point) {
+        typeAssertion.assert(Array.isArray(point) && point.length === 2, positiveMsg, negativeMsg);
+      }));
+    }));
   }));
 }
 
@@ -119,7 +216,12 @@ var index = (function (chai, utils) {
       var assertFunction = getTypeAssertFunction(type);
 
       if (assertFunction) {
-        assertFunction(Assertion, this._obj);
+        new Assertion(this._obj).to.have.property('type').a('string');
+
+        var typeAssertion = new Assertion();
+        utils.transferFlags(this, typeAssertion);
+
+        assertFunction(typeAssertion);
       } else {
         _super.apply(this, arguments);
       }

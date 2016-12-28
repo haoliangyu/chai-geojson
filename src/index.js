@@ -8,7 +8,12 @@ export default (chai, utils) => {
       let assertFunction = getTypeAssertFunction(type);
 
       if (assertFunction) {
-        assertFunction(Assertion, this._obj);
+        new Assertion(this._obj).to.have.property('type').a('string');
+
+        let typeAssertion = new Assertion();
+        utils.transferFlags(this, typeAssertion);
+
+        assertFunction(typeAssertion);
       } else {
         _super.apply(this, arguments);
       }
@@ -16,6 +21,6 @@ export default (chai, utils) => {
   }, function(_super) {
     return function chainingFunction() {
       _super.apply(this, arguments);
-    }
+    };
   });
 };

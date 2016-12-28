@@ -1,21 +1,47 @@
-export function isPoint(Assertion, coordinates) {
-  new Assertion(coordinates).to.have.lengthOf(2);
-};
+export function isPoint(assertion, positiveMsg, negativeMsg) {
+  assertion.assert(
+    assertion._obj.coordinates.length === 2,
+    positiveMsg,
+    negativeMsg
+  );
+}
 
-export function isLineString(Assertion, coordinates) {
-  new Assertion(coordinates).to.have.length.above(1);
+export function isLineString(assertion, positiveMsg, negativeMsg) {
+  assertion.assert(
+    assertion._obj.coordinates.length > 1,
+    positiveMsg,
+    negativeMsg
+  );
 
-  coordinates.forEach(point => {
-    new Assertion(point).to.be.a('array');
-    isPoint(Assertion, point);
+  assertion._obj.coordinates.forEach(point => {
+    assertion.assert(
+      Array.isArray(point) && point.length === 2,
+      positiveMsg,
+      negativeMsg
+    );
   });
 }
 
-export function isPolygon(Assertion, coordinates) {
-  new Assertion(coordinates).to.have.length.above(0);
+export function isPolygon(assertion, positiveMsg, negativeMsg) {
+  assertion.assert(
+    assertion._obj.coordinates.length > 0,
+    positiveMsg,
+    negativeMsg
+  );
 
-  coordinates.forEach(lineString => {
-    new Assertion(lineString).to.be.a('array');
-    isLineString(Assertion, lineString);
+  assertion._obj.coordinates.forEach(lineString => {
+    assertion.assert(
+      Array.isArray(lineString) && lineString.length > 1,
+      positiveMsg,
+      negativeMsg
+    );
+
+    lineString.forEach(point => {
+      assertion.assert(
+        Array.isArray(point) && point.length === 2,
+        positiveMsg,
+        negativeMsg
+      );
+    });
   });
 }

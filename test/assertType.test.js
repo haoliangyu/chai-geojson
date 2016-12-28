@@ -27,7 +27,6 @@ describe('Assert Type', () => {
 
   it('should assert the Point type.', () => {
     let geometry = { type: 'Point', coordinates: [0, 0] };
-    expect(geometry).to.be.a('Geometry');
     expect(geometry).to.be.a('Point');
   });
 

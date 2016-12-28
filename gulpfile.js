@@ -24,22 +24,22 @@ const scripts = {
 
 gulp.task('babel', () => {
   let stream = rollup({
-		entry: scripts.entry,
-		format: "cjs",
-		plugins: [
-			babel({
-				presets: ["es2015-rollup"]
-			})
-		]
+    entry: scripts.entry,
+    format: "cjs",
+    plugins: [
+      babel({
+        presets: ["es2015-rollup"]
+      })
+    ]
   });
 
   stream.on('error', e => {
-    console.error(`${e.stack}`)
-    stream.emit('end')
+    console.error(`${e.stack}`);
+    stream.emit('end');
   })
   .pipe(source('chai-geojson.js'))
   .pipe(streamify(optimizejs()))
-  .pipe(gulp.dest(scripts.dist))
+  .pipe(gulp.dest(scripts.dist));
 
   return stream;
 });
@@ -94,7 +94,7 @@ function addWatchTask(name, path, tasks) {
   });
 }
 
-addWatchTask('watch-src', scripts.src, ['eslint-src', 'compile',  'test']);
+addWatchTask('watch-src', scripts.src, ['eslint-src', 'compile', 'test']);
 addWatchTask('watch-test', scripts.test, ['eslint-test', 'test']);
 
 /**
@@ -103,7 +103,7 @@ addWatchTask('watch-test', scripts.test, ['eslint-test', 'test']);
 
 gulp.task('compile', () => {
   runSequence('babel', 'uglify');
-})
+});
 
 gulp.task('watch', ['watch-src', 'watch-test']);
 gulp.task('default', ['watch']);
