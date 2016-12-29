@@ -2,7 +2,7 @@
   "name": "chai-geojson",
   "version": "0.1.0",
   "description": "Chai plugin for GeoJSON testing",
-  "main": "src/index.js",
+  "main": "dist/chai-geojson.js",
   "scripts": {
     "test": "mocha",
     "compile": "gulp compile",
