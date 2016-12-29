@@ -1,26 +1,48 @@
 'use strict';
 
-function isPoint$1(assertion, positiveMsg, negativeMsg) {
-  assertion.assert(assertion._obj.coordinates.length === 2, positiveMsg, negativeMsg);
+function isPoint$1(assertion, options) {
+
+  options = options || {};
+
+  var coordinates = options.coordinates ? options.coordinates : assertion._obj.coordinates;
+  var negativeMsg = options.negativeMsg ? options.negativeMsg : 'Expect coordinates not to be valid point coordinates';
+  var positiveMsg = options.positiveMsg ? options.positiveMsg : 'Expect [' + coordinates + '] to be valid point coordinates';
+
+  assertion.assert(coordinates.length === 2 && typeof coordinates[0] === 'number' && !Number.isNaN(coordinates[0]) && typeof coordinates[1] === 'number' && !Number.isNaN(coordinates[1]), positiveMsg, negativeMsg);
 }
 
-function isLineString$1(assertion, positiveMsg, negativeMsg) {
-  assertion.assert(assertion._obj.coordinates.length > 1, positiveMsg, negativeMsg);
+function isLineString$1(assertion, options) {
 
-  assertion._obj.coordinates.forEach((function (point) {
-    assertion.assert(Array.isArray(point) && point.length === 2, positiveMsg, negativeMsg);
+  options = options || {};
+
+  var negativeMsg = options.negativeMsg ? options.negativeMsg : 'Expect coordinates not to be valid linestring coordinates';
+  var coordinates = options.coordinates ? options.coordinates : assertion._obj.coordinates;
+
+  assertion.assert(coordinates.length > 1, options.positiveMsg ? options.positiveMsg : 'Expect coordinates to have at least two points', negativeMsg);
+
+  coordinates.forEach((function (point) {
+    isPoint$1(assertion, {
+      coordinates: point,
+      negativeMsg: negativeMsg
+    });
   }));
 }
 
-function isPolygon$1(assertion, positiveMsg, negativeMsg) {
-  assertion.assert(assertion._obj.coordinates.length > 0, positiveMsg, negativeMsg);
+function isPolygon$1(assertion, options) {
 
-  assertion._obj.coordinates.forEach((function (lineString) {
-    assertion.assert(Array.isArray(lineString) && lineString.length > 1, positiveMsg, negativeMsg);
+  options = options || {};
 
-    lineString.forEach((function (point) {
-      assertion.assert(Array.isArray(point) && point.length === 2, positiveMsg, negativeMsg);
-    }));
+  var negativeMsg = options.negativeMsg ? options.negativeMsg : 'Expect coordinates not to be valid polygon coordinates';
+  var coordinates = options.coordinates ? options.coordinates : assertion._obj.coordinates;
+
+  assertion.assert(coordinates.length > 0, options.positiveMsg ? options.positiveMsg : 'Expect coordinates to have at least one ring', negativeMsg);
+
+  coordinates.forEach((function (lineString, index) {
+    isLineString$1(assertion, {
+      coordinates: lineString,
+      positiveMsg: 'Expect ring ' + (index + 1) + ' to be valid linestring coordinates',
+      negativeMsg: negativeMsg
+    });
   }));
 }
 
@@ -150,7 +172,7 @@ function isPoint$$1(typeAssertion) {
 
   typeAssertion.assert(typeAssertion._obj.type === 'Point' && Array.isArray(typeAssertion._obj.coordinates), positiveMsg, negativeMsg);
 
-  isPoint$1(typeAssertion, positiveMsg, negativeMsg);
+  isPoint$1(typeAssertion);
 }
 
 function isLineString$$1(typeAssertion) {
@@ -159,7 +181,7 @@ function isLineString$$1(typeAssertion) {
 
   typeAssertion.assert(typeAssertion._obj.type === 'LineString' && Array.isArray(typeAssertion._obj.coordinates), positiveMsg, negativeMsg);
 
-  isLineString$1(typeAssertion, positiveMsg, negativeMsg);
+  isLineString$1(typeAssertion);
 }
 
 function isPolygon$$1(typeAssertion) {
@@ -168,7 +190,7 @@ function isPolygon$$1(typeAssertion) {
 
   typeAssertion.assert(typeAssertion._obj.type === 'Polygon' && Array.isArray(typeAssertion._obj.coordinates), positiveMsg, negativeMsg);
 
-  isPolygon$1(typeAssertion, positiveMsg, negativeMsg);
+  isPolygon$1(typeAssertion);
 }
 
 function isMultiPoint(typeAssertion) {
@@ -177,7 +199,12 @@ function isMultiPoint(typeAssertion) {
 
   typeAssertion.assert(typeAssertion._obj.type === 'MultiPoint' && Array.isArray(typeAssertion._obj.coordinates), positiveMsg, negativeMsg);
 
-  isLineString$1(typeAssertion, positiveMsg, negativeMsg);
+  typeAssertion._obj.coordinates.forEach((function (point, index) {
+    isPoint$1(typeAssertion, {
+      coordinates: point,
+      positiveMsg: 'Expect point ' + (index + 1) + ' to be valid point coordinates'
+    });
+  }));
 }
 
 function isMultiLineString(typeAssertion) {
@@ -186,7 +213,12 @@ function isMultiLineString(typeAssertion) {
 
   typeAssertion.assert(typeAssertion._obj.type === 'MultiLineString' && Array.isArray(typeAssertion._obj.coordinates), positiveMsg, negativeMsg);
 
-  isPolygon$1(typeAssertion, positiveMsg, negativeMsg);
+  typeAssertion._obj.coordinates.forEach((function (lineString, index) {
+    isLineString$1(typeAssertion, {
+      coordinates: lineString,
+      positiveMsg: 'Expect linestring ' + (index + 1) + ' to be valid linestring coordinates'
+    });
+  }));
 }
 
 function isMultiPolygin(typeAssertion) {
@@ -195,16 +227,11 @@ function isMultiPolygin(typeAssertion) {
 
   typeAssertion.assert(typeAssertion._obj.type === 'MultiPolygon' && Array.isArray(typeAssertion._obj.coordinates), positiveMsg, negativeMsg);
 
-  typeAssertion._obj.coordinates.forEach((function (polygon) {
-    typeAssertion.assert(Array.isArray(polygon) && polygon.length > 0, positiveMsg, negativeMsg);
-
-    polygon.forEach((function (lineString) {
-      typeAssertion.assert(Array.isArray(lineString) && lineString.length > 1, positiveMsg, negativeMsg);
-
-      lineString.forEach((function (point) {
-        typeAssertion.assert(Array.isArray(point) && point.length === 2, positiveMsg, negativeMsg);
-      }));
-    }));
+  typeAssertion._obj.coordinates.forEach((function (polygon, index) {
+    isPolygon$1(typeAssertion, {
+      coordinates: polygon,
+      positiveMsg: 'Expect polygon ' + (index + 1) + ' to be valid polygon coordinates'
+    });
   }));
 }
 

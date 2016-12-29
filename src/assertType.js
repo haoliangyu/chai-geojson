@@ -52,7 +52,7 @@ export function isPoint(typeAssertion) {
     negativeMsg
   );
 
-  assertCoordArray.isPoint(typeAssertion, positiveMsg, negativeMsg);
+  assertCoordArray.isPoint(typeAssertion);
 }
 
 export function isLineString(typeAssertion) {
@@ -66,7 +66,7 @@ export function isLineString(typeAssertion) {
     negativeMsg
   );
 
-  assertCoordArray.isLineString(typeAssertion, positiveMsg, negativeMsg);
+  assertCoordArray.isLineString(typeAssertion);
 }
 
 export function isPolygon(typeAssertion) {
@@ -80,7 +80,7 @@ export function isPolygon(typeAssertion) {
     negativeMsg
   );
 
-  assertCoordArray.isPolygon(typeAssertion, positiveMsg, negativeMsg);
+  assertCoordArray.isPolygon(typeAssertion);
 }
 
 export function isMultiPoint(typeAssertion) {
@@ -94,7 +94,12 @@ export function isMultiPoint(typeAssertion) {
     negativeMsg
   );
 
-  assertCoordArray.isLineString(typeAssertion, positiveMsg, negativeMsg);
+  typeAssertion._obj.coordinates.forEach((point, index) => {
+    assertCoordArray.isPoint(typeAssertion, {
+      coordinates: point,
+      positiveMsg: `Expect point ${index + 1} to be valid point coordinates`
+    });
+  });
 }
 
 export function isMultiLineString(typeAssertion) {
@@ -108,7 +113,12 @@ export function isMultiLineString(typeAssertion) {
     negativeMsg
   );
 
-  assertCoordArray.isPolygon(typeAssertion, positiveMsg, negativeMsg);
+  typeAssertion._obj.coordinates.forEach((lineString, index) => {
+    assertCoordArray.isLineString(typeAssertion, {
+      coordinates: lineString,
+      positiveMsg: `Expect linestring ${index + 1} to be valid linestring coordinates`
+    });
+  });
 }
 
 export function isMultiPolygin(typeAssertion) {
@@ -122,27 +132,10 @@ export function isMultiPolygin(typeAssertion) {
     negativeMsg
   );
 
-  typeAssertion._obj.coordinates.forEach(polygon => {
-    typeAssertion.assert(
-      Array.isArray(polygon) && polygon.length > 0,
-      positiveMsg,
-      negativeMsg
-    );
-
-    polygon.forEach(lineString => {
-      typeAssertion.assert(
-        Array.isArray(lineString) && lineString.length > 1,
-        positiveMsg,
-        negativeMsg
-      );
-
-      lineString.forEach(point => {
-        typeAssertion.assert(
-          Array.isArray(point) && point.length === 2,
-          positiveMsg,
-          negativeMsg
-        );
-      });
+  typeAssertion._obj.coordinates.forEach((polygon, index) => {
+    assertCoordArray.isPolygon(typeAssertion, {
+      coordinates: polygon,
+      positiveMsg: `Expect polygon ${index + 1} to be valid polygon coordinates`
     });
   });
 }

@@ -4,7 +4,7 @@ chai.use(require('../dist/chai-geojson.js'));
 
 const expect = chai.expect;
 
-describe('Assert Type', () => {
+describe('Expect to assert type', () => {
 
   it('should assert the FeatureCollection type.', () => {
     let geojson = {
@@ -53,6 +53,15 @@ describe('Assert Type', () => {
   it('should assert the MultiPolygon type.', () => {
     let geometry = { type: 'MultiPolygon', coordinates: [[[[0, 0], [1, 1], [1, 2]]]] };
     expect(geometry).to.be.a('MultiPolygon');
+  });
+
+  it('should reject an invalid FeatureCollection GeoJSON.', () => {
+    let geojson = {
+      type: 'NotFeatureCollection',
+      features: []
+    };
+
+    expect(geojson).not.to.be.a('FeatureCollection');
   });
 
 });
