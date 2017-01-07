@@ -2,6 +2,40 @@
 # yarn lockfile v1
 
 
+"@mapbox/geojson-area@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@mapbox/geojson-area/-/geojson-area-0.2.2.tgz#18d7814aa36bf23fbbcc379f8e26a22927debf10"
+  dependencies:
+    wgs84 "0.0.0"
+
+"@turf/area@^3.7.1":
+  version "3.7.1"
+  resolved "https://registry.yarnpkg.com/@turf/area/-/area-3.7.1.tgz#33452545a5f93f6f9dc8ef12e02aa7ea40d727e3"
+  dependencies:
+    "@mapbox/geojson-area" "^0.2.2"
+
+"@turf/distance@^3.7.0":
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/@turf/distance/-/distance-3.7.0.tgz#ce229d1b27205534a64ac018fa3247f9e2adc400"
+  dependencies:
+    "@turf/helpers" "^3.6.3"
+    "@turf/invariant" "^3.7.0"
+
+"@turf/helpers@^3.6.3":
+  version "3.7.1"
+  resolved "https://registry.yarnpkg.com/@turf/helpers/-/helpers-3.7.1.tgz#30ac1b735277fc1014435bb8afb0007980c2a005"
+
+"@turf/invariant@^3.7.0":
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/@turf/invariant/-/invariant-3.7.0.tgz#0d90b5033e70e6f567dde5981bdf3a1f0d77cab1"
+
+"@turf/line-distance@^3.7.0":
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/@turf/line-distance/-/line-distance-3.7.0.tgz#803b27ed28d48c89ceeec6ba5f5aa3de0ddb8de5"
+  dependencies:
+    "@turf/distance" "^3.7.0"
+    "@turf/helpers" "^3.6.3"
+
 abbrev@1, abbrev@1.0.x:
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.0.9.tgz#91b4792588a7738c25f35dd6f63752a2f8776135"
@@ -2822,6 +2856,10 @@ vinyl@^0.5.0:
 vlq@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/vlq/-/vlq-0.2.1.tgz#14439d711891e682535467f8587c5630e4222a6c"
+
+wgs84@0.0.0:
+  version "0.0.0"
+  resolved "https://registry.yarnpkg.com/wgs84/-/wgs84-0.0.0.tgz#34fdc555917b6e57cf2a282ed043710c049cdc76"
 
 which-module@^1.0.0:
   version "1.0.0"

@@ -6,7 +6,8 @@
   "scripts": {
     "test": "mocha",
     "compile": "gulp compile",
-    "prepublish": "npm run compile"
+    "prepublish": "npm run compile",
+    "watch": "gulp watch"
   },
   "repository": {
     "type": "git",
@@ -42,6 +43,8 @@
     "vinyl-source-stream": "^1.1.0"
   },
   "dependencies": {
+    "@turf/area": "^3.7.1",
+    "@turf/line-distance": "^3.7.0",
     "chai": "^3.5.0"
   }
 }
