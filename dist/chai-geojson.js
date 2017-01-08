@@ -3,7 +3,7 @@
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var area = _interopDefault(require('@turf/area'));
-var _turf_lineDistance = require('@turf/line-distance');
+var lineDistance = _interopDefault(require('@turf/line-distance'));
 
 function isPoint$1(assertion, options) {
 
@@ -240,7 +240,7 @@ function isMultiPolygin(typeAssertion) {
   }));
 }
 
-function areaEquals(propertyAssertion, expected, precision) {
+function areaEqual(propertyAssertion, expected, precision) {
   var actual = area(propertyAssertion._obj);
   var bound = expected * precision;
 
@@ -253,16 +253,72 @@ function areaAbove(propertyAssertion, bound) {
   propertyAssertion.assert(actual > bound, 'expected area ' + actual + ' m^2 to be above ' + bound + ' m^2', 'expected area ' + actual + ' m^2 not to be above ' + bound + ' m^2');
 }
 
+function areaAtLeast(propertyAssertion, bound) {
+  var actual = area(propertyAssertion._obj);
+
+  propertyAssertion.assert(actual >= bound, 'expected area ' + actual + ' m^2 to be at least ' + bound + ' m^2', 'expected area ' + actual + ' m^2 not to be at least ' + bound + ' m^2');
+}
+
 function areaBelow(propertyAssertion, bound) {
   var actual = area(propertyAssertion._obj);
 
   propertyAssertion.assert(actual < bound, 'expected area ' + actual + ' m^2 to be below ' + bound + ' m^2', 'expected area ' + actual + ' m^2 not to be below ' + bound + ' m^2');
 }
 
+function areaAtMost(propertyAssertion, bound) {
+  var actual = area(propertyAssertion._obj);
+
+  propertyAssertion.assert(actual <= bound, 'expected area ' + actual + ' m^2 to be at most ' + bound + ' m^2', 'expected area ' + actual + ' m^2 not to be at most ' + bound + ' m^2');
+}
+
 function areaWithin(propertyAssertion, lower, upper) {
   var actual = area(propertyAssertion._obj);
 
   propertyAssertion.assert(lower <= actual && actual <= upper, 'expected area ' + actual + ' m^2 to be within ' + lower + ' and ' + upper + ' m^2', 'expected area ' + actual + ' m^2 not to be within ' + lower + ' and ' + upper + ' m^2');
+}
+
+function lengthEqual(propertyAssertion, expected, precision) {
+  var actual = lineDistance(propertyAssertion._obj) * 1000;
+  var bound = expected * precision;
+
+  propertyAssertion.assert(expected - bound <= actual && actual <= expected + bound, 'expected length ' + actual + ' m to euqal ' + expected + ' m with ' + precision + ' percision', 'expected length ' + actual + ' m not to euqal ' + expected + ' m with ' + precision + ' percision');
+}
+
+function lengthAbove(propertyAssertion, bound) {
+  var actual = lineDistance(propertyAssertion._obj) * 1000;
+
+  propertyAssertion.assert(actual > bound, 'expected length ' + actual + ' m to be above ' + bound + ' m', 'expected length ' + actual + ' m not to be above ' + bound + ' m');
+}
+
+function lengthAtLeast(propertyAssertion, bound) {
+  var actual = lineDistance(propertyAssertion._obj) * 1000;
+
+  propertyAssertion.assert(actual >= bound, 'expected length ' + actual + ' m to be at least ' + bound + ' m', 'expected length ' + actual + ' m not to be at least ' + bound + ' m');
+}
+
+function lengthBelow(propertyAssertion, bound) {
+  var actual = lineDistance(propertyAssertion._obj) * 1000;
+
+  propertyAssertion.assert(actual < bound, 'expected length ' + actual + ' m to be below ' + bound + ' m', 'expected length ' + actual + ' m not to be below ' + bound + ' m');
+}
+
+function lengthAtMost(propertyAssertion, bound) {
+  var actual = lineDistance(propertyAssertion._obj) * 1000;
+
+  propertyAssertion.assert(actual <= bound, 'expected length ' + actual + ' m to be at most ' + bound + ' m', 'expected length ' + actual + ' m not to be at most ' + bound + ' m');
+}
+
+function lengthWithin(propertyAssertion, lower, upper) {
+  var actual = lineDistance(propertyAssertion._obj) * 1000;
+
+  propertyAssertion.assert(lower <= actual && actual <= upper, 'expected length ' + actual + ' m to be within ' + lower + ' and ' + upper + ' m', 'expected length ' + actual + ' m not to be within ' + lower + ' and ' + upper + ' m');
+}
+
+function feature(geometry) {
+  return {
+    type: 'Feature',
+    geometry: geometry
+  };
 }
 
 var index = (function (chai, utils) {
@@ -292,7 +348,12 @@ var index = (function (chai, utils) {
     precision = precision || 0;
     new Assertion(precision).to.be.a('Number').within(0, 1);
 
-    areaEquals(this, value, precision);
+    new Assertion(this._obj).to.have.property('type').a('string');
+    if (this._obj.type !== 'Feature' && this._obj.type !== 'FeatureCollection') {
+      this._obj = feature(this._obj);
+    }
+
+    areaEqual(this, value, precision);
   }), (function () {
     this.geomArea = true;
   }));
@@ -303,7 +364,56 @@ var index = (function (chai, utils) {
     precision = precision || 0;
     new Assertion(precision).to.be.a('Number').within(0, 1);
 
-    areaEquals(this, value, precision);
+    new Assertion(this._obj).to.have.property('type').a('string');
+    if (this._obj.type !== 'Feature' && this._obj.type !== 'FeatureCollection') {
+      this._obj = feature(this._obj);
+    }
+
+    areaEqual(this, value, precision);
+  }));
+
+  Assertion.overwriteChainableMethod('length', (function (_super) {
+    return function assertLength(value, precision) {
+      if ('length' in this._obj) {
+        _super.apply(this, arguments);
+      } else {
+        new Assertion(value).to.be.a('Number').at.least(0);
+
+        precision = precision || 0;
+        new Assertion(precision).to.be.a('Number').within(0, 1);
+
+        new Assertion(this._obj).to.have.property('type').a('string');
+        if (this._obj.type !== 'Feature' && this._obj.type !== 'FeatureCollection') {
+          this._obj = feature(this._obj);
+        }
+
+        lengthEqual(this, value, precision);
+      }
+    };
+  }), (function () {
+    return function chainingFunction() {
+      this.geomLength = true;
+    };
+  }));
+
+  Assertion.overwriteMethod('lengthOf', (function (_super) {
+    return function assertPropertyEqual(value, precision) {
+      if ('length' in this._obj) {
+        _super.apply(this, arguments);
+      } else {
+        new Assertion(value).to.be.a('Number').at.least(0);
+
+        precision = precision || 0;
+        new Assertion(precision).to.be.a('Number').within(0, 1);
+
+        new Assertion(this._obj).to.have.property('type').a('string');
+        if (this._obj.type !== 'Feature' && this._obj.type !== 'FeatureCollection') {
+          this._obj = feature(this._obj);
+        }
+
+        lengthEqual(this, value, precision);
+      }
+    };
   }));
 
   Assertion.overwriteMethod('above', (function (_super) {
@@ -311,8 +421,36 @@ var index = (function (chai, utils) {
       if (this.geomArea || this.geomLength) {
         new Assertion(value).to.be.a('Number').at.least(0);
 
+        new Assertion(this._obj).to.have.property('type').a('string');
+        if (this._obj.type !== 'Feature' && this._obj.type !== 'FeatureCollection') {
+          this._obj = feature(this._obj);
+        }
+
         if (this.geomArea) {
           areaAbove(this, value);
+        } else {
+          lengthAbove(this, value);
+        }
+      } else {
+        _super.apply(this, arguments);
+      }
+    };
+  }));
+
+  Assertion.overwriteMethod('least', (function (_super) {
+    return function assertPropertyEqual(value) {
+      if (this.geomArea || this.geomLength) {
+        new Assertion(value).to.be.a('Number').at.least(0);
+
+        new Assertion(this._obj).to.have.property('type').a('string');
+        if (this._obj.type !== 'Feature' && this._obj.type !== 'FeatureCollection') {
+          this._obj = feature(this._obj);
+        }
+
+        if (this.geomArea) {
+          areaAtLeast(this, value);
+        } else {
+          lengthAtLeast(this, value);
         }
       } else {
         _super.apply(this, arguments);
@@ -325,8 +463,36 @@ var index = (function (chai, utils) {
       if (this.geomArea || this.geomLength) {
         new Assertion(value).to.be.a('Number').at.least(0);
 
+        new Assertion(this._obj).to.have.property('type').a('string');
+        if (this._obj.type !== 'Feature' && this._obj.type !== 'FeatureCollection') {
+          this._obj = feature(this._obj);
+        }
+
         if (this.geomArea) {
           areaBelow(this, value);
+        } else {
+          lengthBelow(this, value);
+        }
+      } else {
+        _super.apply(this, arguments);
+      }
+    };
+  }));
+
+  Assertion.overwriteMethod('most', (function (_super) {
+    return function assertPropertyEqual(value) {
+      if (this.geomArea || this.geomLength) {
+        new Assertion(value).to.be.a('Number').at.least(0);
+
+        new Assertion(this._obj).to.have.property('type').a('string');
+        if (this._obj.type !== 'Feature' && this._obj.type !== 'FeatureCollection') {
+          this._obj = feature(this._obj);
+        }
+
+        if (this.geomArea) {
+          areaAtMost(this, value);
+        } else {
+          lengthAtMost(this, value);
         }
       } else {
         _super.apply(this, arguments);
@@ -340,8 +506,15 @@ var index = (function (chai, utils) {
         new Assertion(lower).to.be.a('Number').at.least(0);
         new Assertion(upper).to.be.a('Number').at.least(upper);
 
+        new Assertion(this._obj).to.have.property('type').a('string');
+        if (this._obj.type !== 'Feature' && this._obj.type !== 'FeatureCollection') {
+          this._obj = feature(this._obj);
+        }
+
         if (this.geomArea) {
           areaWithin(this, lower, upper);
+        } else {
+          lengthWithin(this, lower, upper);
         }
       } else {
         _super.apply(this, arguments);
